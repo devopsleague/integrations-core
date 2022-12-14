@@ -255,6 +255,7 @@ ACTIVITY_METRICS_9_6 = [
     "COUNT(CASE WHEN wait_event is NOT NULL AND query !~ '^autovacuum:' THEN 1 ELSE null END )",
     "COUNT(CASE WHEN wait_event is NOT NULL AND query !~ '^autovacuum:' AND state = 'active' THEN 1 ELSE null END )",
     "max(EXTRACT(EPOCH FROM (clock_timestamp() - xact_start)))",
+    "max(age(backend_xid))",
     "max(age(backend_xmin))",
 ]
 
@@ -267,6 +268,7 @@ ACTIVITY_METRICS_9_2 = [
     "COUNT(CASE WHEN waiting = 't' AND query !~ '^autovacuum:' THEN 1 ELSE null END )",
     "COUNT(CASE WHEN waiting = 't' AND query !~ '^autovacuum:' AND state = 'active' THEN 1 ELSE null END )",
     "max(EXTRACT(EPOCH FROM (clock_timestamp() - xact_start)))",
+    "null",  # backend_xid is not available
     "null",  # backend_xmin is not available
 ]
 
@@ -279,6 +281,7 @@ ACTIVITY_METRICS_8_3 = [
     "COUNT(CASE WHEN waiting = 't' AND query !~ '^autovacuum:' THEN 1 ELSE null END )",
     "COUNT(CASE WHEN waiting = 't' AND query !~ '^autovacuum:' AND state = 'active' THEN 1 ELSE null END )",
     "max(EXTRACT(EPOCH FROM (clock_timestamp() - xact_start)))",
+    "null",  # backend_xid is not available
     "null",  # backend_xmin is not available
 ]
 
@@ -291,6 +294,7 @@ ACTIVITY_METRICS_LT_8_3 = [
     "COUNT(CASE WHEN waiting = 't' AND query !~ '^autovacuum:' THEN 1 ELSE null END )",
     "COUNT(CASE WHEN waiting = 't' AND query !~ '^autovacuum:' AND state = 'active' THEN 1 ELSE null END )",
     "max(EXTRACT(EPOCH FROM (clock_timestamp() - query_start)))",
+    "null",  # backend_xid is not available
     "null",  # backend_xmin is not available
 ]
 
@@ -301,7 +305,8 @@ ACTIVITY_DD_METRICS = [
     ("postgresql.active_queries", AgentCheck.gauge),
     ("postgresql.waiting_queries", AgentCheck.gauge),
     ("postgresql.active_waiting_queries", AgentCheck.gauge),
-    ("postgresql.activity.oldest_xact_start", AgentCheck.gauge),
+    ("postgresql.activity.xact_start_age", AgentCheck.gauge),
+    ("postgresql.activity.backend_xid_age", AgentCheck.gauge),
     ("postgresql.activity.backend_xmin_age", AgentCheck.gauge),
 ]
 
