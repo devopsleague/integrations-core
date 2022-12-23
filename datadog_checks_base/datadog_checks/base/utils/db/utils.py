@@ -46,16 +46,20 @@ SUBMISSION_METHODS = {
 
 def _traced_dbm_async_job_method(f):
     # traces DBMAsyncJob.run_job only if tracing is enabled
-    if os.getenv('DDEV_TRACE_ENABLED', 'false') == 'true':
+    if os.getenv('DDEV_TRACE_ENABLED', 'false') == 'true' or is_affirmative(datadog_agent.get_config('integration_tracing')):
         try:
             from ddtrace import tracer
 
             @functools.wraps(f)
             def wrapper(self, *args, **kwargs):
                 with tracer.trace(
+                    # match the same primary operation name that comes from the regular integration tracing
                     "run",
-                    service="{}-integration".format(self._check.name),
-                    resource="{}.run_job".format(type(self).__name__),
+                    service="datadog-agent-integrations",
+                    resource="{}.{}.run_job".format(
+                        self._check.name,
+                        type(self).__name__
+                    ),
                 ):
                     self.run_job()
 
